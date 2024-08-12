@@ -12,10 +12,16 @@ if [[ $UID != 0 ]]; then
     exit 1
 fi
 
-PV=/dev/sda3
-LV=/dev/ubuntu-vg/ubuntu-lv
+if [ -n $REMOTE_CONTAINERS && $REMOTE_CONTAINERS == true ]; then 
+    echo " Working in DevContainer skipping partition"
+    exit 0
+fi
+if [ -n $ENVIRONMENT == APPLIANCE ]; then 
+    PV=/dev/sda3
+    LV=/dev/ubuntu-vg/ubuntu-lv
 
-growpart $(sed -E "s/([0-9]+)$/ \1/" <<< $PV)
-pvresize $PV
-lvextend -l +100%FREE $LV
-resize2fs $LV
+    growpart $(sed -E "s/([0-9]+)$/ \1/" <<< $PV)
+    pvresize $PV
+    lvextend -l +100%FREE $LV
+    resize2fs $LV
+fi
